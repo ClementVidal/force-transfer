@@ -1,0 +1,29 @@
+{
+  "name": "force-transfer",
+  "version": "0.0.0",
+  "description": "JS implementation of the force transfer algorithm, used to suppress overlap in graph layout",
+  "main": "force-transfer.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ClementVidal/force-transfer.git"
+  },
+  "keywords": [
+    "graph",
+    "layout",
+    "force",
+    "transfer"
+  ],
+  "author": "Clement Vidal",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ClementVidal/force-transfer/issues"
+  },
+  "homepage": "https://github.com/ClementVidal/force-transfer",
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    "grunt-browser-sync": "^2.1.3"
+  }
+}
