@@ -8,8 +8,10 @@ module.exports = function(grunt) {
                 src: ['src/*.js', 'demo/*.js', 'demo/*.html', 'demo/*.css']
             },
             options: {
+                startPath: 'demo/index.html',
                 server: {
-                    baseDir: ['./demo', './src']
+                    baseDir: ['./' ],
+                    index: "index.html"
                 }
             }
         }
