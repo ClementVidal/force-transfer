@@ -5,7 +5,7 @@
   "authors": [
     "Clément Vidal <clementvidalperso@gmail.com>"
   ],
-  "description": "JS implementation of the force transfer algorithm, used to suppress overlap in graph layout",
+  "description": "JS library to layout abstract node of graph in clever ways",
   "main": "graph-layout.js",
   "keywords": [
     "graph",

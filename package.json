@@ -1,7 +1,7 @@
 {
   "name": "graph-layout",
   "version": "0.0.0",
-  "description": "JS implementation of the force transfer algorithm, used to suppress overlap in graph layout",
+  "description": "JS library to layout abstract node of graph in clever ways",
   "main": "graph-layout.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
