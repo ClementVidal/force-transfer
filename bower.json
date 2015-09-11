@@ -1,12 +1,12 @@
 {
-  "name": "ft-graph-layout",
+  "name": "graph-layout",
   "version": "0.0.0",
-  "homepage": "https://github.com/ClementVidal/ft-graph-layout",
+  "homepage": "https://github.com/ClementVidal/graph-layout",
   "authors": [
     "Clément Vidal <clementvidalperso@gmail.com>"
   ],
   "description": "JS implementation of the force transfer algorithm, used to suppress overlap in graph layout",
-  "main": "ft-graph-layout.js",
+  "main": "graph-layout.js",
   "keywords": [
     "graph",
     "layout",

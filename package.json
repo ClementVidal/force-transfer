@@ -1,14 +1,14 @@
 {
-  "name": "ft-graph-layout",
+  "name": "graph-layout",
   "version": "0.0.0",
   "description": "JS implementation of the force transfer algorithm, used to suppress overlap in graph layout",
-  "main": "ft-graph-layout.js",
+  "main": "graph-layout.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/ClementVidal/ft-graph-layout.git"
+    "url": "https://github.com/ClementVidal/graph-layout.git"
   },
   "keywords": [
     "graph",
@@ -19,9 +19,9 @@
   "author": "Clement Vidal",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/ClementVidal/ft-graph-layout/issues"
+    "url": "https://github.com/ClementVidal/graph-layout/issues"
   },
-  "homepage": "https://github.com/ClementVidal/ft-graph-layout",
+  "homepage": "https://github.com/ClementVidal/graph-layout",
   "devDependencies": {
     "grunt": "^0.4.5",
     "grunt-browser-sync": "^2.1.3"
