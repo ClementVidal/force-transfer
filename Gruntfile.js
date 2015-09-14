@@ -5,20 +5,42 @@ module.exports = function(grunt) {
         pkg: grunt.file.readJSON('package.json'),
         browserSync: {
             bsFiles: {
-                src: ['src/*.js', 'demo/*.js', 'demo/*.html', 'demo/*.css']
+                src: ['dist/*.js', 'demo/*.js', 'demo/*.html', 'demo/*.css']
             },
             options: {
                 startPath: 'demo/index.html',
                 server: {
-                    baseDir: ['./' ],
+                    baseDir: ['./'],
                     index: "index.html"
                 }
+            }
+        },
+        concat: {
+            options: {
+                separator: ';',
+                banner: '(function() {"use strict";',
+                footer: '}).call(this);'
+            },
+            dist: {
+                src: ['src/graph.js', 'src/layout.js', 'src/module.js'],
+                dest: 'dist/graph-layout.js',
+            },
+        },
+        watch: {
+            scripts: {
+                files: ['src/*.js'],
+                tasks: ['concat'],
+                options: {
+                    spawn: false,
+                },
             }
         }
     });
 
     // Load the plugin that provides the "uglify" task.
     grunt.loadNpmTasks('grunt-browser-sync');
+    grunt.loadNpmTasks('grunt-contrib-concat');
+    grunt.loadNpmTasks('grunt-contrib-watch');
 
     // Default task(s).
 
