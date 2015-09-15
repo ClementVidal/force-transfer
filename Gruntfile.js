@@ -8,6 +8,7 @@ module.exports = function(grunt) {
                 src: ['dist/*.js', 'demo/*.js', 'demo/*.html', 'demo/*.css']
             },
             options: {
+                watchTask: true,
                 startPath: 'demo/index.html',
                 server: {
                     baseDir: ['./'],
@@ -43,5 +44,6 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-watch');
 
     // Default task(s).
+    grunt.registerTask('default', ['browserSync', 'watch']);
 
 };
