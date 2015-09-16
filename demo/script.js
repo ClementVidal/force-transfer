@@ -17,7 +17,6 @@ function generateInitialLayout() {
         var translate = 'translate('+x+'px,'+y+'px)';
 
         div.style.transform = translate;
-
     }
 }
 

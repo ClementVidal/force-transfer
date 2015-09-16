@@ -28,7 +28,7 @@ DivAdaptor.prototype.setup = function(graph, nodeSelector, rootElement) {
             y = parseInt(values[1].replace("px", ""));
         }
 
-        graph.addNode(x, y, 0, 0, nodes[i]);
+        graph.addNode(x, y, nodes[i].offsetWidth, nodes[i].offsetHeight, nodes[i]);
     }
     for (var i = 0; i < nodes.length; i++) {
         for (var j = 0; j < nodes.length; j++) {

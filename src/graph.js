@@ -51,8 +51,12 @@ function Node(x, y, w, h) {
     this.mass = 1;
 }
 
+Node.prototype.getDiagonalLength = function() {
+    return Math.sqrt(this.size.x * this.size.x + this.size.y * this.size.y);
+}
+
 Node.prototype.vectorTo = function(otherNode) {
-    return otherNode.pos.subtract( this.pos );
+    return otherNode.pos.subtract(this.pos);
 }
 
 Node.prototype.applyForce = function(force) {
@@ -67,7 +71,7 @@ Node.prototype.energy = function() {
 /**
  * Edge class
  */
-function Edge( sourceID,targetId, springLength, k ) {
+function Edge(sourceID, targetId, springLength, k) {
     this.sourceId = sourceID;
     this.targetId = targetId;
 }
@@ -79,6 +83,10 @@ function Graph() {
     this.nodeList = [];
     this.edgeList = [];
     this.adjacency = [];
+}
+
+Graph.prototype.getEdgeNodes = function(edge) {
+    return [this.nodeList[edge.sourceId], this.nodeList[edge.targetId]];
 }
 
 Graph.prototype.totalEnergy = function() {
@@ -112,7 +120,7 @@ Graph.prototype.addEdge = function(sourceId, targetId) {
     if (!(targetId in this.adjacency[sourceId])) {
         var edge = new Edge(sourceId, targetId);
         this.adjacency[sourceId][targetId] = edge;
-        this.edgeList.push( edge );
+        this.edgeList.push(edge);
     } else {
         throw new Error('Edge already exist');
         return null;

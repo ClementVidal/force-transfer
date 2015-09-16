@@ -15,12 +15,17 @@ function Layout(graph) {
     this.minEnergyThreshold = 2; //threshold used to determine render stop
     this.maxIterationCount = 60 * 6;
     this.springStiffness = 20.0; // spring stiffness constant
-    this.springLength = 400;
+    this.springMarginLength = 10;
 }
 
 Layout.prototype.getSpring = function(edge) {
     if (!_.contains(this.springList, edge)) {
-        this.springList[edge] = new Spring(this.springLength, this.springStiffness);
+        var nodes = this.graph.getEdgeNodes( edge );
+
+        var springLength = nodes[0].getDiagonalLength()  + nodes[1].getDiagonalLength() +  this.springMarginLength;
+        //var springLength = this.springMarginLength;
+
+        this.springList[edge] = new Spring(springLength, this.springStiffness);
     }
 
     return this.springList[edge];
@@ -43,7 +48,7 @@ Layout.prototype.start = function(updateCallback) {
 
         // Compute delta time
         var t1 = new Date().getTime();
-        var dt = 0.001*(t1-t0);
+        var dt = 0.001 * (t1 - t0);
         t0 = t1;
 
         iterationCount++;
@@ -87,17 +92,15 @@ Layout.prototype.applyHookesLaw = function() {
     self.graph.forEachEdge(function(edge) {
 
         var spring = self.getSpring(edge);
+        var nodes = self.graph.getEdgeNodes( edge );
 
-        var n1 = self.graph.nodeList[edge.sourceId];
-        var n2 = self.graph.nodeList[edge.targetId];
-
-        var d = n1.vectorTo(n2);
+        var d = nodes[0].vectorTo(nodes[1]);
         var displacement = spring.length - d.magnitude();
         var direction = d.normalise();
 
         // apply force to each end point
-        n1.applyForce(direction.multiply(spring.stiffness * displacement * -0.5));
-        n2.applyForce(direction.multiply(spring.stiffness * displacement * 0.5));
+        nodes[0].applyForce(direction.multiply(spring.stiffness * displacement * -0.5));
+        nodes[1].applyForce(direction.multiply(spring.stiffness * displacement * 0.5));
     });
 };
 
@@ -115,8 +118,8 @@ Layout.prototype.updateNodes = function(timestep) {
 Layout.prototype.attractToCentre = function(timestep) {
     var self = this;
     self.graph.forEachNode(function(node) {
-        var direction = node.pos.multiply( -1.0 );
-        node.applyForce( direction.multiply( self.recenterForce ) );
+        var direction = node.pos.multiply(-1.0);
+        node.applyForce(direction.multiply(self.recenterForce));
 
     });
 };
