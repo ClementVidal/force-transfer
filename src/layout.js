@@ -9,9 +9,10 @@ function Layout(graph) {
     this.graph = graph;
     this.springList = {};
 
-    this.repulsion = 400.0; // repulsion constant
+    this.recenterForce = 8;
+    this.repulsionForce = 400.0; // repulsionForce constant
     this.velocityDamping = 0.7; // velocity velocityDamping factor
-    this.minEnergyThreshold = 5; //threshold used to determine render stop
+    this.minEnergyThreshold = 2; //threshold used to determine render stop
     this.maxIterationCount = 60 * 6;
     this.springStiffness = 20.0; // spring stiffness constant
     this.springLength = 400;
@@ -28,7 +29,7 @@ Layout.prototype.getSpring = function(edge) {
 Layout.prototype.update = function(timestep) {
     this.applyCoulombsLaw();
     this.applyHookesLaw();
-    this.attractToCentre();
+    //this.attractToCentre();
     this.updateNodes(timestep);
 }
 
@@ -36,21 +37,24 @@ Layout.prototype.start = function(updateCallback) {
 
     var self = this;
     var iterationCount = 0;
-    var timestep = 0.03;
+    var t0 = new Date().getTime();
 
     requestAnimationFrame(function step() {
+
+        // Compute delta time
+        var t1 = new Date().getTime();
+        var dt = 0.001*(t1-t0);
+        t0 = t1;
+
         iterationCount++;
-        self.update(timestep);
+        self.update(dt);
         updateCallback(self.graph);
 
-        console.log('Energy ', self.graph.totalEnergy());
         if (self.isStable() || iterationCount >= self.maxIterationCount) {
             console.log('Graph is stable, exiting');
-
         } else {
             requestAnimationFrame(step);
         }
-
     });
 }
 
@@ -58,7 +62,7 @@ Layout.prototype.start = function(updateCallback) {
 Layout.prototype.applyCoulombsLaw = function() {
 
     var self = this;
-    if (self.repulsion == 0.0)
+    if (self.repulsionForce == 0.0)
         return;
 
     self.graph.forEachNode(function(n1) {
@@ -70,8 +74,8 @@ Layout.prototype.applyCoulombsLaw = function() {
                 var direction = d.normalise();
 
                 // apply force to each end points
-                n1.applyForce(direction.multiply(self.repulsion).divide(distance * distance * 0.5));
-                n2.applyForce(direction.multiply(self.repulsion).divide(distance * distance * -0.5));
+                n1.applyForce(direction.multiply(self.repulsionForce).divide(distance * distance * 0.5));
+                n2.applyForce(direction.multiply(self.repulsionForce).divide(distance * distance * -0.5));
 
             }
         });
@@ -112,7 +116,7 @@ Layout.prototype.attractToCentre = function(timestep) {
     var self = this;
     self.graph.forEachNode(function(node) {
         var direction = node.pos.multiply( -1.0 );
-        node.applyForce( direction.multiply( self.repulsion / 50 ) );
+        node.applyForce( direction.multiply( self.recenterForce ) );
 
     });
 };

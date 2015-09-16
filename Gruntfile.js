@@ -23,7 +23,7 @@ module.exports = function(grunt) {
                 footer: '}).call(this);'
             },
             dist: {
-                src: ['src/graph.js', 'src/layout.js', 'src/module.js'],
+                src: ['src/graph.js', 'src/adaptor.js', 'src/layout.js', 'src/module.js'],
                 dest: 'dist/graph-layout.js',
             },
         },
@@ -45,5 +45,6 @@ module.exports = function(grunt) {
 
     // Default task(s).
     grunt.registerTask('default', ['browserSync', 'watch']);
+    grunt.registerTask('build', ['concat']);
 
 };
