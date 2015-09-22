@@ -13,7 +13,10 @@ function DivAdaptor() {
 DivAdaptor.prototype.apply = function(graph) {
     graph.forEachNode(function(n) {
         var translate = 'translate(' + n.pos.x + 'px,' + n.pos.y + 'px)';
-        n.data.style.transform = translate;
+        //n.data.style.transform = translate;
+        n.data.style.offsetTop = n.pos.y;
+        n.data.style.offsetLeft = n.pos.x;
+
     });
 }
 
