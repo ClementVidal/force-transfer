@@ -142,10 +142,18 @@ Graph.prototype.forEachNode = function(callback) {
         callback.call(t, node);
     });
 };
-;function DivAdaptor() {
+;/**
+ * Provide an adaptor to create a graph from a set of dom elements
+ */
+function DivAdaptor() {
 
 }
 
+/**
+ * This should be called on each layout update to move the dom elements according to the current state of the layout
+ * @param  {[type]} graph [description]
+ * @return {[type]}       [description]
+ */
 DivAdaptor.prototype.apply = function(graph) {
     graph.forEachNode(function(n) {
         var translate = 'translate(' + n.pos.x + 'px,' + n.pos.y + 'px)';
@@ -153,6 +161,12 @@ DivAdaptor.prototype.apply = function(graph) {
     });
 }
 
+/**
+ * Build the graph
+ * @param  graph        The graph to setup
+ * @param  nodeSelector CSS selector to select with childs elements of rootElement should be interpreted as nodes
+ * @param  rootElement  The root element
+ */
 DivAdaptor.prototype.setup = function(graph, nodeSelector, rootElement) {
 
     var nodes = rootElement.querySelectorAll(nodeSelector);
@@ -205,9 +219,9 @@ function Layout(graph) {
 
 Layout.prototype.getSpring = function(edge) {
     if (!_.contains(this.springList, edge)) {
-        var nodes = this.graph.getEdgeNodes( edge );
+        var nodes = this.graph.getEdgeNodes(edge);
 
-        var springLength = nodes[0].getDiagonalLength()  + nodes[1].getDiagonalLength() +  this.springMarginLength;
+        var springLength = nodes[0].getDiagonalLength() + nodes[1].getDiagonalLength() + this.springMarginLength;
         //var springLength = this.springMarginLength;
 
         this.springList[edge] = new Spring(springLength, this.springStiffness);
@@ -223,7 +237,7 @@ Layout.prototype.update = function(timestep) {
     this.updateNodes(timestep);
 }
 
-Layout.prototype.start = function(updateCallback) {
+Layout.prototype.start = function(updateCallback, onGraphStable) {
 
     var self = this;
     var iterationCount = 0;
@@ -241,7 +255,9 @@ Layout.prototype.start = function(updateCallback) {
         updateCallback(self.graph);
 
         if (self.isStable() || iterationCount >= self.maxIterationCount) {
-            console.log('Graph is stable, exiting');
+            if (onGraphStable !== undefined) {
+                onGraphStable(self.graph);
+            }
         } else {
             requestAnimationFrame(step);
         }
@@ -277,7 +293,7 @@ Layout.prototype.applyHookesLaw = function() {
     self.graph.forEachEdge(function(edge) {
 
         var spring = self.getSpring(edge);
-        var nodes = self.graph.getEdgeNodes( edge );
+        var nodes = self.graph.getEdgeNodes(edge);
 
         var d = nodes[0].vectorTo(nodes[1]);
         var displacement = spring.length - d.magnitude();
