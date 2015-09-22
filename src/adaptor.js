@@ -1,7 +1,15 @@
+/**
+ * Provide an adaptor to create a graph from a set of dom elements
+ */
 function DivAdaptor() {
 
 }
 
+/**
+ * This should be called on each layout update to move the dom elements according to the current state of the layout
+ * @param  {[type]} graph [description]
+ * @return {[type]}       [description]
+ */
 DivAdaptor.prototype.apply = function(graph) {
     graph.forEachNode(function(n) {
         var translate = 'translate(' + n.pos.x + 'px,' + n.pos.y + 'px)';
@@ -9,6 +17,12 @@ DivAdaptor.prototype.apply = function(graph) {
     });
 }
 
+/**
+ * Build the graph
+ * @param  graph        The graph to setup
+ * @param  nodeSelector CSS selector to select with childs elements of rootElement should be interpreted as nodes
+ * @param  rootElement  The root element
+ */
 DivAdaptor.prototype.setup = function(graph, nodeSelector, rootElement) {
 
     var nodes = rootElement.querySelectorAll(nodeSelector);

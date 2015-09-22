@@ -20,9 +20,9 @@ function Layout(graph) {
 
 Layout.prototype.getSpring = function(edge) {
     if (!_.contains(this.springList, edge)) {
-        var nodes = this.graph.getEdgeNodes( edge );
+        var nodes = this.graph.getEdgeNodes(edge);
 
-        var springLength = nodes[0].getDiagonalLength()  + nodes[1].getDiagonalLength() +  this.springMarginLength;
+        var springLength = nodes[0].getDiagonalLength() + nodes[1].getDiagonalLength() + this.springMarginLength;
         //var springLength = this.springMarginLength;
 
         this.springList[edge] = new Spring(springLength, this.springStiffness);
@@ -38,7 +38,7 @@ Layout.prototype.update = function(timestep) {
     this.updateNodes(timestep);
 }
 
-Layout.prototype.start = function(updateCallback) {
+Layout.prototype.start = function(updateCallback, onGraphStable) {
 
     var self = this;
     var iterationCount = 0;
@@ -56,7 +56,9 @@ Layout.prototype.start = function(updateCallback) {
         updateCallback(self.graph);
 
         if (self.isStable() || iterationCount >= self.maxIterationCount) {
-            console.log('Graph is stable, exiting');
+            if (onGraphStable !== undefined) {
+                onGraphStable(self.graph);
+            }
         } else {
             requestAnimationFrame(step);
         }
@@ -92,7 +94,7 @@ Layout.prototype.applyHookesLaw = function() {
     self.graph.forEachEdge(function(edge) {
 
         var spring = self.getSpring(edge);
-        var nodes = self.graph.getEdgeNodes( edge );
+        var nodes = self.graph.getEdgeNodes(edge);
 
         var d = nodes[0].vectorTo(nodes[1]);
         var displacement = spring.length - d.magnitude();
