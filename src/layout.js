@@ -5,17 +5,20 @@ function Spring(length, stiffness) {
     this.stiffness = stiffness
 }
 
-function Layout(graph) {
+function Layout(graph, options ) {
+    if( options === undefined ) {
+        options = {};
+    }
     this.graph = graph;
     this.springList = {};
 
-    this.recenterForce = 8;
-    this.repulsionForce = 400.0; // repulsionForce constant
-    this.velocityDamping = 0.7; // velocity velocityDamping factor
-    this.minEnergyThreshold = 2; //threshold used to determine render stop
-    this.maxIterationCount = 60 * 6;
-    this.springStiffness = 20.0; // spring stiffness constant
-    this.springMarginLength = 10;
+    this.recenterForce = options.recenterForce || 8;
+    this.repulsionForce = options.repulsionForce || 400.0; // repulsionForce constant
+    this.velocityDamping = options.velocityDamping || 0.7; // velocity velocityDamping factor
+    this.minEnergyThreshold = options.minEnergyThreshold || 2; //threshold used to determine render stop
+    this.maxIterationCount = options.maxIterationCount || 60 * 3;
+    this.springStiffness = options.springStiffness || 20.0; // spring stiffness constant
+    this.springMarginLength = options.springMarginLength || 10;
 }
 
 Layout.prototype.getSpring = function(edge) {
@@ -23,7 +26,6 @@ Layout.prototype.getSpring = function(edge) {
         var nodes = this.graph.getEdgeNodes(edge);
 
         var springLength = nodes[0].getDiagonalLength() + nodes[1].getDiagonalLength() + this.springMarginLength;
-        //var springLength = this.springMarginLength;
 
         this.springList[edge] = new Spring(springLength, this.springStiffness);
     }
@@ -38,7 +40,7 @@ Layout.prototype.update = function(timestep) {
     this.updateNodes(timestep);
 }
 
-Layout.prototype.start = function(updateCallback, onGraphStable) {
+Layout.prototype.start = function(onUpdate, onGraphStable) {
 
     var self = this;
     var iterationCount = 0;
@@ -53,7 +55,7 @@ Layout.prototype.start = function(updateCallback, onGraphStable) {
 
         iterationCount++;
         self.update(dt);
-        updateCallback(self.graph);
+        onUpdate(self.graph);
 
         if (self.isStable() || iterationCount >= self.maxIterationCount) {
             if (onGraphStable !== undefined) {

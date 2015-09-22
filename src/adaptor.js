@@ -12,7 +12,7 @@ function DivAdaptor() {
  */
 DivAdaptor.prototype.apply = function(graph) {
     graph.forEachNode(function(n) {
-        n.data.offset( {top:  n.pos.y, left:  n.pos.x } );
+        $(n.data).offset( {top:  n.pos.y, left:  n.pos.x } );
     });
 }
 
@@ -28,12 +28,8 @@ DivAdaptor.prototype.setup = function(graph, nodeSelector, rootElement) {
 
     for (var i = 0; i < nodes.length; i++) {
 
-        var tr = nodes[i].style.transform;
-        var x = 0;
-        var y = 0;
-
-        x = nodes[i].offset().left;
-        y = nodes[i].offset().top;
+        var x = $(nodes[i]).offset().left;
+        var y = $(nodes[i]).offset().top;
 
         graph.addNode(x, y, nodes[i].offsetWidth, nodes[i].offsetHeight, nodes[i]);
     }

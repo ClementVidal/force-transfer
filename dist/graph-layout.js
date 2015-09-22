@@ -156,7 +156,7 @@ function DivAdaptor() {
  */
 DivAdaptor.prototype.apply = function(graph) {
     graph.forEachNode(function(n) {
-        n.data.offset( {top:  n.pos.y, left:  n.pos.x } );
+        $(n.data).offset( {top:  n.pos.y, left:  n.pos.x } );
     });
 }
 
@@ -172,12 +172,8 @@ DivAdaptor.prototype.setup = function(graph, nodeSelector, rootElement) {
 
     for (var i = 0; i < nodes.length; i++) {
 
-        var tr = nodes[i].style.transform;
-        var x = 0;
-        var y = 0;
-
-        x = nodes[i].offset().left;
-        y = nodes[i].offset().top;
+        var x = $(nodes[i]).offset().left;
+        var y = $(nodes[i]).offset().top;
 
         graph.addNode(x, y, nodes[i].offsetWidth, nodes[i].offsetHeight, nodes[i]);
     }
@@ -197,17 +193,20 @@ function Spring(length, stiffness) {
     this.stiffness = stiffness
 }
 
-function Layout(graph) {
+function Layout(graph, options ) {
+    if( options === undefined ) {
+        options = {};
+    }
     this.graph = graph;
     this.springList = {};
 
-    this.recenterForce = 8;
-    this.repulsionForce = 400.0; // repulsionForce constant
-    this.velocityDamping = 0.7; // velocity velocityDamping factor
-    this.minEnergyThreshold = 2; //threshold used to determine render stop
-    this.maxIterationCount = 60 * 6;
-    this.springStiffness = 20.0; // spring stiffness constant
-    this.springMarginLength = 10;
+    this.recenterForce = options.recenterForce || 8;
+    this.repulsionForce = options.repulsionForce || 400.0; // repulsionForce constant
+    this.velocityDamping = options.velocityDamping || 0.7; // velocity velocityDamping factor
+    this.minEnergyThreshold = options.minEnergyThreshold || 2; //threshold used to determine render stop
+    this.maxIterationCount = options.maxIterationCount || 60 * 3;
+    this.springStiffness = options.springStiffness || 20.0; // spring stiffness constant
+    this.springMarginLength = options.springMarginLength || 10;
 }
 
 Layout.prototype.getSpring = function(edge) {
@@ -215,7 +214,6 @@ Layout.prototype.getSpring = function(edge) {
         var nodes = this.graph.getEdgeNodes(edge);
 
         var springLength = nodes[0].getDiagonalLength() + nodes[1].getDiagonalLength() + this.springMarginLength;
-        //var springLength = this.springMarginLength;
 
         this.springList[edge] = new Spring(springLength, this.springStiffness);
     }
@@ -230,7 +228,7 @@ Layout.prototype.update = function(timestep) {
     this.updateNodes(timestep);
 }
 
-Layout.prototype.start = function(updateCallback, onGraphStable) {
+Layout.prototype.start = function(onUpdate, onGraphStable) {
 
     var self = this;
     var iterationCount = 0;
@@ -245,7 +243,7 @@ Layout.prototype.start = function(updateCallback, onGraphStable) {
 
         iterationCount++;
         self.update(dt);
-        updateCallback(self.graph);
+        onUpdate(self.graph);
 
         if (self.isStable() || iterationCount >= self.maxIterationCount) {
             if (onGraphStable !== undefined) {
