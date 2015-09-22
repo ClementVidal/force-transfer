@@ -156,7 +156,7 @@ function DivAdaptor() {
  */
 DivAdaptor.prototype.apply = function(graph) {
     graph.forEachNode(function(n) {
-        $(n.data).offset( {top:  n.pos.y, left:  n.pos.x } );
+        $(n.data).css( {top:  n.pos.y, left:  n.pos.x } );
     });
 }
 
@@ -172,8 +172,9 @@ DivAdaptor.prototype.setup = function(graph, nodeSelector, rootElement) {
 
     for (var i = 0; i < nodes.length; i++) {
 
-        var x = $(nodes[i]).offset().left;
-        var y = $(nodes[i]).offset().top;
+        
+        var x = parseFloat( $(nodes[i]).css('left') );
+        var y = parseFloat( $(nodes[i]).css('top') );
 
         graph.addNode(x, y, nodes[i].offsetWidth, nodes[i].offsetHeight, nodes[i]);
     }
