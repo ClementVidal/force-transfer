@@ -32,9 +32,10 @@ DivAdaptor.prototype.setup = function(graph, nodeSelector, rootElement) {
     for (var i = 0; i < nodes.length; i++) {
         var x = parseFloat(nodes[i].style.left);
         var y = parseFloat(nodes[i].style.top);
-        graph.addNode(x, y, nodes[i].offsetWidth, nodes[i].offsetHeight, nodes[i]);
+
+        graph.addNode(isNaN( x ) ? 0.0 : x, isNaN( x ) ? 0.0 : y, nodes[i].offsetWidth, nodes[i].offsetHeight, nodes[i]);
     }
-    
+
     for (var i = 0; i < nodes.length; i++) {
         for (var j = 0; j < nodes.length; j++) {
             if (j != i) {

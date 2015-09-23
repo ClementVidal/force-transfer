@@ -7,25 +7,23 @@ function generateInitialLayout() {
 
         var div = document.createElement("div");
         container.appendChild(div);
-
         div.className += " node";
-
-        var spread = 400;
-        var x = Math.random() * spread + container.offsetWidth / 2 - spread;
-        var y = Math.random() * spread + container.offsetHeight / 2 - spread / 2;
-
-        div.style.top = y+"px";
-        div.style.left = x+"px";
     }
 }
 
 generateInitialLayout();
 
 var graph = graphLayout.newGraph();
-var layout = graphLayout.newLayout(graph);
+var layout = graphLayout.newLayout(graph, {
+    initialLayout: {
+        type: 'randomCircle',
+        radius: 200,
+        center: {x:600, y:400}
+    }
+});
 var divAdaptor = graphLayout.newDivAdaptor();
 
-divAdaptor.setup(graph, '.node', document);
+divAdaptor.setup(graph, '.node', container);
 
 layout.start(function(graph) {
 
