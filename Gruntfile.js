@@ -46,5 +46,4 @@ module.exports = function(grunt) {
     // Default task(s).
     grunt.registerTask('test', ['browserSync', 'watch']);
     grunt.registerTask('build', ['concat']);
-
 };
