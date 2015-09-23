@@ -1,42 +1,3 @@
-/**
- * Vector class
- */
-var Vector = function(x, y) {
-    this.x = x;
-    this.y = y;
-};
-
-Vector.random = function() {
-    return new Vector(Math.random(), Math.random());
-};
-
-Vector.prototype.add = function(v2) {
-    return new Vector(this.x + v2.x, this.y + v2.y);
-};
-
-Vector.prototype.subtract = function(v2) {
-    return new Vector(this.x - v2.x, this.y - v2.y);
-};
-
-Vector.prototype.multiply = function(n) {
-    return new Vector(this.x * n, this.y * n);
-};
-
-Vector.prototype.divide = function(n) {
-    return new Vector((this.x / n) || 0, (this.y / n) || 0); // Avoid divide by zero errors..
-};
-
-Vector.prototype.magnitude = function() {
-    return Math.sqrt(this.x * this.x + this.y * this.y);
-};
-
-Vector.prototype.normal = function() {
-    return new Vector(-this.y, this.x);
-};
-
-Vector.prototype.normalise = function() {
-    return this.divide(this.magnitude());
-};
 
 /**
  * Node Class
@@ -99,15 +60,34 @@ Graph.prototype.totalEnergy = function() {
 };
 
 /**
- * Add a new node
+ * Add a new node.
+ * Node are defined by:
+ * 	- a position: { x, y }
+ *  - a size: { w,h }
+ *
+ * Additional user datacan be stored in each node by providing a data argument
+ *
+ * Each node must be uniquely identified.
+ * Unique ID are automaticly assigned for each node ( using a single incremented integer )
+ * Or can be provided using the id parameter
  */
-Graph.prototype.addNode = function(x, y, w, h, data) {
+Graph.prototype.addNode = function(x, y, w, h, data, id ) {
     var node = new Node(x, y, w, h);
     node.data = data;
+    node.id = id || this.nodeList.length;
     this.nodeList.push(node);
     return node;
 }
 
+/**
+ * Iterator over the list of nodes
+ */
+Graph.prototype.forEachNode = function(callback) {
+    var t = this;
+    this.nodeList.forEach(function(node) {
+        callback.call(t, node);
+    });
+};
 
 /**
  * Add an edge between to nodes
@@ -133,12 +113,5 @@ Graph.prototype.forEachEdge = function(callback) {
     var t = this;
     this.edgeList.forEach(function(edge) {
         callback.call(t, edge);
-    });
-};
-
-Graph.prototype.forEachNode = function(callback) {
-    var t = this;
-    this.nodeList.forEach(function(node) {
-        callback.call(t, node);
     });
 };

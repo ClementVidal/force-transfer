@@ -14,10 +14,8 @@ function generateInitialLayout() {
         var x = Math.random() * spread + container.offsetWidth / 2 - spread;
         var y = Math.random() * spread + container.offsetHeight / 2 - spread / 2;
 
-        $(div).offset({
-            top: y,
-            left: x
-        });
+        div.style.top = y+"px";
+        div.style.left = x+"px";
     }
 }
 

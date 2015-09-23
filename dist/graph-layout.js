@@ -37,7 +37,7 @@ Vector.prototype.normal = function() {
 Vector.prototype.normalise = function() {
     return this.divide(this.magnitude());
 };
-
+;
 /**
  * Node Class
  */
@@ -99,15 +99,34 @@ Graph.prototype.totalEnergy = function() {
 };
 
 /**
- * Add a new node
+ * Add a new node.
+ * Node are defined by:
+ * 	- a position: { x, y }
+ *  - a size: { w,h }
+ *
+ * Additional user datacan be stored in each node by providing a data argument
+ *
+ * Each node must be uniquely identified.
+ * Unique ID are automaticly assigned for each node ( using a single incremented integer )
+ * Or can be provided using the id parameter
  */
-Graph.prototype.addNode = function(x, y, w, h, data) {
+Graph.prototype.addNode = function(x, y, w, h, data, id ) {
     var node = new Node(x, y, w, h);
     node.data = data;
+    node.id = id || this.nodeList.length;
     this.nodeList.push(node);
     return node;
 }
 
+/**
+ * Iterator over the list of nodes
+ */
+Graph.prototype.forEachNode = function(callback) {
+    var t = this;
+    this.nodeList.forEach(function(node) {
+        callback.call(t, node);
+    });
+};
 
 /**
  * Add an edge between to nodes
@@ -135,15 +154,11 @@ Graph.prototype.forEachEdge = function(callback) {
         callback.call(t, edge);
     });
 };
-
-Graph.prototype.forEachNode = function(callback) {
-    var t = this;
-    this.nodeList.forEach(function(node) {
-        callback.call(t, node);
-    });
-};
 ;/**
  * Provide an adaptor to create a graph from a set of dom elements
+ * Adaptor are created this way:
+ * 	var divAdaptor = graphLayout.newDivAdaptor();
+ * 	divAdaptor.setup(graph, '.node', document);
  */
 function DivAdaptor() {
 
@@ -151,12 +166,12 @@ function DivAdaptor() {
 
 /**
  * This should be called on each layout update to move the dom elements according to the current state of the layout
- * @param  {[type]} graph [description]
- * @return {[type]}       [description]
+ * @param  The currently used graph
  */
 DivAdaptor.prototype.apply = function(graph) {
     graph.forEachNode(function(n) {
-        $(n.data).css( {top:  n.pos.y, left:  n.pos.x } );
+        n.data.style.top = n.pos.y+"px";
+        n.data.style.left = n.pos.x+"px";
     });
 }
 
@@ -171,13 +186,11 @@ DivAdaptor.prototype.setup = function(graph, nodeSelector, rootElement) {
     var nodes = rootElement.querySelectorAll(nodeSelector);
 
     for (var i = 0; i < nodes.length; i++) {
-
-        
-        var x = parseFloat( $(nodes[i]).css('left') );
-        var y = parseFloat( $(nodes[i]).css('top') );
-
+        var x = parseFloat(nodes[i].style.left);
+        var y = parseFloat(nodes[i].style.top);
         graph.addNode(x, y, nodes[i].offsetWidth, nodes[i].offsetHeight, nodes[i]);
     }
+    
     for (var i = 0; i < nodes.length; i++) {
         for (var j = 0; j < nodes.length; j++) {
             if (j != i) {
@@ -187,21 +200,13 @@ DivAdaptor.prototype.setup = function(graph, nodeSelector, rootElement) {
     }
     return graph;
 }
-;var requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame || window.msRequestAnimationFrame;
-
-function Spring(length, stiffness) {
-    this.length = length;
-    this.stiffness = stiffness
-}
-
-function Layout(graph, options ) {
-    if( options === undefined ) {
+;function Layout(graph, options) {
+    if (options === undefined) {
         options = {};
     }
     this.graph = graph;
     this.springList = {};
 
-    this.recenterForce = options.recenterForce || 8;
     this.repulsionForce = options.repulsionForce || 400.0; // repulsionForce constant
     this.velocityDamping = options.velocityDamping || 0.7; // velocity velocityDamping factor
     this.minEnergyThreshold = options.minEnergyThreshold || 2; //threshold used to determine render stop
@@ -210,30 +215,14 @@ function Layout(graph, options ) {
     this.springMarginLength = options.springMarginLength || 10;
 }
 
-Layout.prototype.getSpring = function(edge) {
-    if (!_.contains(this.springList, edge)) {
-        var nodes = this.graph.getEdgeNodes(edge);
-
-        var springLength = nodes[0].getDiagonalLength() + nodes[1].getDiagonalLength() + this.springMarginLength;
-
-        this.springList[edge] = new Spring(springLength, this.springStiffness);
-    }
-
-    return this.springList[edge];
-}
-
-Layout.prototype.update = function(timestep) {
-    this.applyCoulombsLaw();
-    this.applyHookesLaw();
-    //this.attractToCentre();
-    this.updateNodes(timestep);
-}
-
 Layout.prototype.start = function(onUpdate, onGraphStable) {
 
     var self = this;
     var iterationCount = 0;
     var t0 = new Date().getTime();
+
+    var requestAnimationFrame = window.requestAnimationFrame || window.mozRequestAnimationFrame ||
+        window.webkitRequestAnimationFrame || window.msRequestAnimationFrame;
 
     requestAnimationFrame(function step() {
 
@@ -243,10 +232,10 @@ Layout.prototype.start = function(onUpdate, onGraphStable) {
         t0 = t1;
 
         iterationCount++;
-        self.update(dt);
+        self._update(dt);
         onUpdate(self.graph);
 
-        if (self.isStable() || iterationCount >= self.maxIterationCount) {
+        if (self._isStable() || iterationCount >= self.maxIterationCount) {
             if (onGraphStable !== undefined) {
                 onGraphStable(self.graph);
             }
@@ -256,8 +245,30 @@ Layout.prototype.start = function(onUpdate, onGraphStable) {
     });
 }
 
+Layout.prototype._getSpring = function(edge) {
 
-Layout.prototype.applyCoulombsLaw = function() {
+    function Spring(length, stiffness) {
+        this.length = length;
+        this.stiffness = stiffness
+    }
+
+    if (!_.contains(this.springList, edge)) {
+        var nodes = this.graph.getEdgeNodes(edge);
+        var springLength = nodes[0].getDiagonalLength() + nodes[1].getDiagonalLength() + this.springMarginLength;
+
+        this.springList[edge] = new Spring(springLength, this.springStiffness);
+    }
+
+    return this.springList[edge];
+}
+
+Layout.prototype._update = function(timestep) {
+    this._applyCoulombsLaw();
+    this._applyHookesLaw();
+    this._updateNodes(timestep);
+}
+
+Layout.prototype._applyCoulombsLaw = function() {
 
     var self = this;
     if (self.repulsionForce == 0.0)
@@ -280,11 +291,11 @@ Layout.prototype.applyCoulombsLaw = function() {
     });
 };
 
-Layout.prototype.applyHookesLaw = function() {
+Layout.prototype._applyHookesLaw = function() {
     var self = this;
     self.graph.forEachEdge(function(edge) {
 
-        var spring = self.getSpring(edge);
+        var spring = self._getSpring(edge);
         var nodes = self.graph.getEdgeNodes(edge);
 
         var d = nodes[0].vectorTo(nodes[1]);
@@ -297,7 +308,7 @@ Layout.prototype.applyHookesLaw = function() {
     });
 };
 
-Layout.prototype.updateNodes = function(timestep) {
+Layout.prototype._updateNodes = function(timestep) {
     var self = this;
     self.graph.forEachNode(function(node) {
         node.velocity = node.velocity.add(node.acceleration.multiply(timestep));
@@ -308,16 +319,7 @@ Layout.prototype.updateNodes = function(timestep) {
     });
 };
 
-Layout.prototype.attractToCentre = function(timestep) {
-    var self = this;
-    self.graph.forEachNode(function(node) {
-        var direction = node.pos.multiply(-1.0);
-        node.applyForce(direction.multiply(self.recenterForce));
-
-    });
-};
-
-Layout.prototype.isStable = function() {
+Layout.prototype._isStable = function() {
     return this.graph.totalEnergy() < this.minEnergyThreshold;
 }
 ;window.graphLayout = {
