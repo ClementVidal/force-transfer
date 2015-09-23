@@ -6,12 +6,11 @@ function Layout(graph, options) {
     this.springList = {};
     this.options = {};
 
-    this.options.repulsionForce = options.repulsionForce || 400.0; // repulsionForce constant
-    this.options.velocityDamping = options.velocityDamping || 0.7; // velocity velocityDamping factor
-    this.options.minEnergyThreshold = options.minEnergyThreshold || 2; //threshold used to determine render stop
+    this.options.velocityDamping = options.velocityDamping || 0.4; // velocity velocityDamping factor
+    this.options.minEnergyThreshold = options.minEnergyThreshold || 3; //threshold used to determine render stop
     this.options.maxIterationCount = options.maxIterationCount || 60 * 3;
-    this.options.springStiffness = options.springStiffness || 20.0; // spring stiffness constant
-    this.options.springMarginLength = options.springMarginLength || 10;
+    this.options.springStiffness = options.springStiffness || 40.0; // spring stiffness constant
+    this.options.springMarginLength = options.springMarginLength || 0;
 
     if (options.initialLayout) {
         this.options.initialLayout = {};
@@ -31,19 +30,21 @@ function Layout(graph, options) {
 
 Layout.prototype.setupInitialLayout = function() {
 
-    for (var i = 0; i < this.graph.nodeList.length; i++) {
-        var frac = (i / (this.graph.nodeList.length)) * Math.PI * 2;
+    if (this.options.initialLayout.style === "randomCircle") {
+        for (var i = 0; i < this.graph.nodeList.length; i++) {
+            var frac = (i / (this.graph.nodeList.length)) * Math.PI * 2;
 
-        var radius = this.options.initialLayout.radius * Math.random();
-        var xPos = Math.cos(frac) * radius;
-        var yPos = Math.sin(frac) * radius;
+            var radius = this.options.initialLayout.radius * Math.random();
+            var xPos = Math.cos(frac) * radius;
+            var yPos = Math.sin(frac) * radius;
 
-        this.graph.nodeList[i].pos.x = xPos + this.options.initialLayout.center.x;
-        this.graph.nodeList[i].pos.y = yPos + this.options.initialLayout.center.y;
+            this.graph.nodeList[i].pos.x = xPos + this.options.initialLayout.center.x;
+            this.graph.nodeList[i].pos.y = yPos + this.options.initialLayout.center.y;
+        }
     }
 }
 
-Layout.prototype.start = function(onUpdate, onGraphStable) {
+Layout.prototype.start = function(onUpdateView, onGraphStable) {
 
     var self = this;
     var iterationCount = 0;
@@ -56,7 +57,7 @@ Layout.prototype.start = function(onUpdate, onGraphStable) {
         self.setupInitialLayout();
     }
 
-    onUpdate(self.graph);
+    onUpdateView(self.graph);
 
     requestAnimationFrame(function step() {
 
@@ -67,7 +68,7 @@ Layout.prototype.start = function(onUpdate, onGraphStable) {
 
         iterationCount++;
         self._update(dt);
-        onUpdate(self.graph);
+        onUpdateView(self.graph);
 
         if (self._isStable() || iterationCount >= self.options.maxIterationCount) {
 
@@ -98,33 +99,10 @@ Layout.prototype._getSpring = function(edge) {
 }
 
 Layout.prototype._update = function(timestep) {
-    this._applyCoulombsLaw();
     this._applyHookesLaw();
     this._updateNodes(timestep);
 }
 
-Layout.prototype._applyCoulombsLaw = function() {
-
-    var self = this;
-    if (self.options.repulsionForce == 0.0)
-        return;
-
-    self.graph.forEachNode(function(n1) {
-        self.graph.forEachNode(function(n2) {
-
-            if (n1 !== n2) {
-                var d = n2.vectorTo(n1);
-                var distance = d.magnitude() + 0.1; // avoid massive forces at small distances (and divide by zero)
-                var direction = d.normalise();
-
-                // apply force to each end points
-                n1.applyForce(direction.multiply(self.options.repulsionForce).divide(distance * distance * 0.5));
-                n2.applyForce(direction.multiply(self.options.repulsionForce).divide(distance * distance * -0.5));
-
-            }
-        });
-    });
-};
 
 Layout.prototype._applyHookesLaw = function() {
     var self = this;
