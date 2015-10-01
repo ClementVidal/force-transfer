@@ -8,4 +8,4 @@ window.graphLayout = {
     newDivAdaptor: function( nodeSelector, rootElement ) {
         return new DivAdaptor(nodeSelector, rootElement);
     }
-}
+};

@@ -14,20 +14,20 @@ function Node(x, y, w, h) {
 
 Node.prototype.getDiagonalLength = function() {
     return Math.sqrt(this.size.x * this.size.x + this.size.y * this.size.y);
-}
+};
 
 Node.prototype.vectorTo = function(otherNode) {
     return otherNode.pos.subtract(this.pos);
-}
+};
 
 Node.prototype.applyForce = function(force) {
     this.acceleration = this.acceleration.add(force.divide(this.mass));
-}
+};
 
 Node.prototype.energy = function() {
     var speed = this.velocity.magnitude();
     return 0.5 * this.mass * speed * speed;
-}
+};
 
 /**
  * Edge class
@@ -48,7 +48,7 @@ function Graph() {
 
 Graph.prototype.getEdgeNodes = function(edge) {
     return [this.nodeList[edge.sourceId], this.nodeList[edge.targetId]];
-}
+};
 
 Graph.prototype.totalEnergy = function() {
     var energy = 0.0;
@@ -77,7 +77,7 @@ Graph.prototype.addNode = function(x, y, w, h, data, id ) {
     node.id = id || this.nodeList.length;
     this.nodeList.push(node);
     return node;
-}
+};
 
 /**
  * Iterator over the list of nodes
@@ -103,11 +103,10 @@ Graph.prototype.addEdge = function(sourceId, targetId) {
         this.edgeList.push(edge);
     } else {
         throw new Error('Edge already exist');
-        return null;
     }
 
     return this.adjacency[sourceId][targetId];
-}
+};
 
 Graph.prototype.forEachEdge = function(callback) {
     var t = this;

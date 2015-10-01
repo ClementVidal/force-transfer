@@ -42,7 +42,7 @@ Layout.prototype.setupInitialLayout = function() {
             this.graph.nodeList[i].pos.y = yPos + this.options.initialLayout.center.y;
         }
     }
-}
+};
 
 Layout.prototype.start = function(onUpdateView, onGraphStable) {
 
@@ -79,13 +79,13 @@ Layout.prototype.start = function(onUpdateView, onGraphStable) {
             requestAnimationFrame(step);
         }
     });
-}
+};
 
 Layout.prototype._getSpring = function(edge) {
 
     function Spring(length, stiffness) {
         this.length = length;
-        this.stiffness = stiffness
+        this.stiffness = stiffness;
     }
 
     if (!_.contains(this.springList, edge)) {
@@ -96,12 +96,12 @@ Layout.prototype._getSpring = function(edge) {
     }
 
     return this.springList[edge];
-}
+};
 
 Layout.prototype._update = function(timestep) {
     this._applyHookesLaw();
     this._updateNodes(timestep);
-}
+};
 
 
 Layout.prototype._applyHookesLaw = function() {
@@ -134,4 +134,4 @@ Layout.prototype._updateNodes = function(timestep) {
 
 Layout.prototype._isStable = function() {
     return this.graph.totalEnergy() < this.options.minEnergyThreshold;
-}
+};
