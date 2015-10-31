@@ -4,6 +4,7 @@
 
 It does not provide built in rendering backend, so it can be used either to layout a graph within a SVG canvas or to layout DIV within your markup.
 
+GitHub page: http://clementvidal.github.io/graph-layout/
 
 ## Installation
 
